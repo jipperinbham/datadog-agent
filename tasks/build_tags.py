@@ -30,8 +30,8 @@ ALL_TAGS = set([
     "zlib",
 ])
 
-# IOT_TAGS lists the tags needed when building the IOT Agent
-IOT_TAGS = [
+# IOT_AGENT_TAGS lists the tags needed when building the IOT Agent
+IOT_AGENT_TAGS = [
     "zlib",
     "systemd",
 ]
@@ -77,7 +77,7 @@ def get_default_build_tags(iot=False, process=False, arch="x64"):
     """
     include = ["all"]
     if iot:
-        include = IOT_TAGS
+        include = IOT_AGENT_TAGS
 
     exclude = [] if sys.platform.startswith("linux") else LINUX_ONLY_TAGS
     # if not process agent, ignore process only tags
@@ -127,15 +127,15 @@ def audit_tag_impact(ctx, build_exclude=None, csv=False):
     """
     build_exclude = [] if build_exclude is None else build_exclude.split(",")
 
-    tags_to_audit = ALL_TAGS.difference(set(build_exclude)).difference(set(IOT_TAGS))
+    tags_to_audit = ALL_TAGS.difference(set(build_exclude)).difference(set(IOT_AGENT_TAGS))
 
     max_size = _compute_build_size(ctx, build_exclude=','.join(build_exclude))
     print("size with all tags is {} kB".format(max_size / 1000))
 
-    iot_size = _compute_build_size(ctx, iot=True)
-    print("iot size is {} kB\n".format(iot_size / 1000))
+    iot_agent_size = _compute_build_size(ctx, iot=True)
+    print("iot agent size is {} kB\n".format(iot_agent_size / 1000))
 
-    report = {"unaccounted": max_size - iot_size, "iot": iot_size}
+    report = {"unaccounted": max_size - iot_agent_size, "iot_agent": iot_agent_size}
 
     for tag in tags_to_audit:
         exclude_string = ','.join(build_exclude + [tag])
